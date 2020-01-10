@@ -39,9 +39,10 @@ namespace MimicAPI.Controllers
         //Rota -> site/api/palavras para cair no método abaixo (POST: id, nome, ativo, pontuação, data da criação).
         [Route("")]
         [HttpPost]
-        public ActionResult Cadastrar(Palavra palavra)
+        public ActionResult Cadastrar([FromBody]Palavra palavra)
         {
             _banco.Palavras.Add(palavra);
+            _banco.SaveChanges();
 
             return Ok();
         }
@@ -49,9 +50,10 @@ namespace MimicAPI.Controllers
         //Rota -> site/api/palavras/1 para cair no método abaixo com o parâmetro 1 (PUT: id, nome, ativo, pontuação, data da criação).
         [Route("{id}")]
         [HttpPut]
-        public ActionResult Atualizar(int id, Palavra palavra)
+        public ActionResult Atualizar(int id, [FromBody]Palavra palavra)
         {
             _banco.Palavras.Update(palavra);
+            _banco.SaveChanges();
 
             return Ok();
         }
