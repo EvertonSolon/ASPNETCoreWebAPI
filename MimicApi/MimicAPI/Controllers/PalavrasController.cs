@@ -20,12 +20,19 @@ namespace MimicAPI.Controllers
         }
 
         //App
-        //Rota -> site/api/palavras para cair no método abaixo.
+        //Rota -> site/api/palavras?data=2020-01-11 para cair no método abaixo.
         [Route("")]
         [HttpGet]
-        public ActionResult ObterTodas()
+        public ActionResult ObterTodas(DateTime? data)
         {
-            return Ok(_banco.Palavras);
+            var item = _banco.Palavras.AsQueryable();
+
+            if (!data.HasValue)
+                ; //TODO
+            else
+                item = item.Where(x => x.Criado > data.Value || x.Atualizado > data.Value);
+
+            return Ok(item);
         }
 
         //Web
