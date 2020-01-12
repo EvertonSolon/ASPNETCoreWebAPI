@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 using MimicAPI.Database;
+using MimicAPI.Helpers;
 using MimicAPI.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace MimicAPI.Controllers
 {
@@ -21,16 +22,39 @@ namespace MimicAPI.Controllers
 
         //App
         //Rota -> site/api/palavras?data=2020-01-11 para cair no método abaixo.
+        //Rota -> site/api/palavras?pagina=1 para cair no método abaixo.
         [Route("")]
         [HttpGet]
-        public ActionResult ObterTodas(DateTime? data)
+        public ActionResult ObterTodas([FromQuery]PalavraUrlQueryString queryString)
         {
             var item = _banco.Palavras.AsQueryable();
 
-            if (!data.HasValue)
-                ; //TODO
-            else
-                item = item.Where(x => x.Criado > data.Value || x.Atualizado > data.Value);
+            if (queryString.Data.HasValue)
+                item = item.Where(x => x.Criado > queryString.Data.Value || x.Atualizado > queryString.Data.Value);
+
+            if(queryString.Pagina.HasValue)
+            {
+                var qtdeTotalRegistros = item.Count();
+                var qtdeRegistrosParaPular = (queryString.Pagina.Value - 1) * queryString.QtdeRegistros.Value;
+                var qtdeTotalPaginas = (int)Math.Ceiling((double)qtdeTotalRegistros / queryString.QtdeRegistros.Value);
+
+                item = item.Skip(qtdeRegistrosParaPular).Take(queryString.QtdeRegistros.Value);
+
+                var paginacao = new Paginacao
+                {
+                    NumeroPagina = queryString.Pagina.Value,
+                    RegistroPorPagina = queryString.QtdeRegistros.Value,
+                    TotalRegistros = qtdeTotalRegistros,
+                    TotalPaginas = qtdeTotalPaginas
+                };
+
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(paginacao));
+
+                if (queryString.Pagina.Value > paginacao.TotalPaginas)
+                    return NotFound();
+            }
+
+
 
             return Ok(item);
         }
