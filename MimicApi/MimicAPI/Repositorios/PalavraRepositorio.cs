@@ -74,7 +74,7 @@ namespace MimicAPI.Repositorios
                 listaPaginacao.Paginacao = paginacao;
             }
 
-            listaPaginacao.AddRange(item.ToList());
+            listaPaginacao.Palavras.AddRange(item.ToList());
 
             return listaPaginacao;
         }

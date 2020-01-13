@@ -13,6 +13,7 @@ namespace MimicAPI.Helpers
         public DtoAutoMapperProfile()
         {
             CreateMap<Palavra, PalavraDto>();
+            CreateMap<ListaPaginacao<Palavra>, ListaPaginacao<PalavraDto>>();
         }
         
     }

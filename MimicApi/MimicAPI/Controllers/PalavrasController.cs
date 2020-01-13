@@ -24,21 +24,21 @@ namespace MimicAPI.Controllers
         //App
         //Rota -> site/api/palavras?data=2020-01-11 para cair no método abaixo.
         //Rota -> site/api/palavras?pagina=1 para cair no método abaixo.
-        [Route("")]
+        [Route("", Name = "ObterTodas")]
         [HttpGet]
         public ActionResult ObterTodas([FromQuery]PalavraUrlQueryString queryString)
         {
             var listaObjetos = _palavraRepositorio.ObterTodas(queryString);
 
-            if(listaObjetos.Count == 0)
+            if(listaObjetos.Palavras.Count == 0)
                 return NotFound();
 
             if (listaObjetos.Paginacao != null)
                 Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(listaObjetos.Paginacao));
 
-            var listaDto = _mapper.Map<ListaPaginacao<Palavra>, ListaPaginacao<PalavraDto>>(listaObjetos);
+            var listaPalavraDto = _mapper.Map<ListaPaginacao<Palavra>, ListaPaginacao<PalavraDto>>(listaObjetos);
 
-            foreach (var palavra in listaDto)
+            foreach (var palavra in listaPalavraDto.Palavras)
             {
                 palavra.Links = new List<LinkDto>
                 {
@@ -46,7 +46,11 @@ namespace MimicAPI.Controllers
                 };
             }
 
-            return Ok(listaDto);
+            listaPalavraDto.ListaLinks.Add(
+                new LinkDto("self", Url.Link("ObterTodas", queryString), "GET")
+                );
+
+            return Ok(listaPalavraDto);
         }
 
         //Web
