@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MimicAPI.Database;
+using MimicAPI.Repositorios;
+using MimicAPI.Repositorios.Interfaces;
 using System.IO;
 using System.Reflection;
 
@@ -19,6 +21,9 @@ namespace MimicAPI
                 opt.UseSqlite("Data Source=Database\\Mimic.db");
             });
             services.AddMvc();
+
+            //Repository pattern
+            services.AddScoped<IPalavraRepositorio, PalavraRepositorio>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
