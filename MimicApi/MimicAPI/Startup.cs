@@ -10,6 +10,7 @@ using System.Reflection;
 using AutoMapper;
 using MimicAPI.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace MimicAPI
 {
@@ -36,7 +37,10 @@ namespace MimicAPI
             services.AddMvc();
             services.AddApiVersioning(cfg => {
                 cfg.ReportApiVersions = true;
-                
+
+                //Pode-se receber a versão pelo cabeçalho da API.
+                cfg.ApiVersionReader = new HeaderApiVersionReader("api-version");
+
                 //Assume a versão padrão quando esta não for especificado na querystring.
                 cfg.AssumeDefaultVersionWhenUnspecified = true; 
                 cfg.DefaultApiVersion = new ApiVersion(1, 0);
