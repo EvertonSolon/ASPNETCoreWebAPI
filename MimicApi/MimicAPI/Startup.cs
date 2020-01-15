@@ -39,7 +39,7 @@ namespace MimicAPI
                 cfg.ReportApiVersions = true;
 
                 //Pode-se receber a versão pelo cabeçalho da API.
-                cfg.ApiVersionReader = new HeaderApiVersionReader("api-version");
+                //cfg.ApiVersionReader = new HeaderApiVersionReader("api-version");
 
                 //Assume a versão padrão quando esta não for especificado na querystring.
                 cfg.AssumeDefaultVersionWhenUnspecified = true; 
