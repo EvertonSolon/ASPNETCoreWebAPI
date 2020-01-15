@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MimicAPI.Database;
-using MimicAPI.Repositorios;
-using MimicAPI.Repositorios.Interfaces;
+using MimicAPI.Versao1.Repositorios;
+using MimicAPI.Versao1.Repositorios.Interfaces;
 using System.IO;
 using System.Reflection;
 using AutoMapper;
 using MimicAPI.Helpers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MimicAPI
 {
@@ -33,6 +34,10 @@ namespace MimicAPI
                 opt.UseSqlite("Data Source=Database\\Mimic.db");
             });
             services.AddMvc();
+            services.AddApiVersioning(cfg => {
+                cfg.ReportApiVersions = true;
+                cfg.DefaultApiVersion = new ApiVersion(1, 0);
+            });
 
             //Repository pattern
             services.AddScoped<IPalavraRepositorio, PalavraRepositorio>();

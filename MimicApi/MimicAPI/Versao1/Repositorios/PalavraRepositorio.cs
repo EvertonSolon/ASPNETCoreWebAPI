@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MimicAPI.Database;
 using MimicAPI.Helpers;
-using MimicAPI.Models;
-using MimicAPI.Repositorios.Interfaces;
+using MimicAPI.Versao1.Models;
+using MimicAPI.Versao1.Repositorios.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MimicAPI.Repositorios
+namespace MimicAPI.Versao1.Repositorios
 {
     public class PalavraRepositorio : IPalavraRepositorio
     {

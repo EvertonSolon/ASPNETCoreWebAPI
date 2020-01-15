@@ -1,16 +1,18 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MimicAPI.Helpers;
-using MimicAPI.Models;
-using MimicAPI.Models.Dto;
-using MimicAPI.Repositorios.Interfaces;
+using MimicAPI.Versao1.Models;
+using MimicAPI.Versao1.Models.Dto;
+using MimicAPI.Versao1.Repositorios.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace MimicAPI.Controllers
+namespace MimicAPI.Versao2.Controllers
 {
-    [Route("api/palavras")]
+    [ApiController]
+    [ApiVersion("2.0")] // /api/v1/palavras
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class PalavrasController : ControllerBase
     {
         private readonly IPalavraRepositorio _palavraRepositorio;
@@ -27,16 +29,17 @@ namespace MimicAPI.Controllers
         //Rota -> site/api/palavras?pagina=1 para cair no método abaixo.
         [Route("", Name = "ObterTodas")]
         [HttpGet]
-        public ActionResult ObterTodas([FromQuery]PalavraUrlQueryString queryString)
+        public string ObterTodas([FromQuery]PalavraUrlQueryString queryString)
         {
-            var listaObjetos = _palavraRepositorio.ObterTodas(queryString);
+            //var listaObjetos = _palavraRepositorio.ObterTodas(queryString);
 
-            if (listaObjetos.Palavras.Count == 0)
-                return NotFound();
+            //if (listaObjetos.Palavras.Count == 0)
+            //    return NotFound();
 
-            var listaPalavraDto = CriarListaLinksPalavraDto(queryString, listaObjetos);
+            //var listaPalavraDto = CriarListaLinksPalavraDto(queryString, listaObjetos);
 
-            return Ok(listaPalavraDto);
+            //return Ok(listaPalavraDto);
+            return "Versão 2";
         }
 
         private ListaPaginacao<PalavraDto> CriarListaLinksPalavraDto(PalavraUrlQueryString queryString, ListaPaginacao<Palavra> listaObjetos)

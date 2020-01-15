@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MimicAPI.Models
+namespace MimicAPI.Versao1.Models
 {
     /// <summary>
     /// As validações foram incluídas nesta entidade mas sei que poderia existir uma view model e incluir lá.
