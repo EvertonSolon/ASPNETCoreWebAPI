@@ -36,6 +36,9 @@ namespace MimicAPI
             services.AddMvc();
             services.AddApiVersioning(cfg => {
                 cfg.ReportApiVersions = true;
+                
+                //Assume a versão padrão quando esta não for especificado na querystring.
+                cfg.AssumeDefaultVersionWhenUnspecified = true; 
                 cfg.DefaultApiVersion = new ApiVersion(1, 0);
             });
 

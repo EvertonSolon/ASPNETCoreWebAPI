@@ -12,7 +12,8 @@ namespace MimicAPI.Versao2.Controllers
 {
     [ApiController]
     [ApiVersion("2.0")] // /api/v1/palavras
-    [Route("api/v{version:apiVersion}/[controller]")]
+    //[Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/[controller]")] // api/palavras? api-version=2
     public class PalavrasController : ControllerBase
     {
         private readonly IPalavraRepositorio _palavraRepositorio;

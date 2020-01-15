@@ -13,7 +13,8 @@ namespace MimicAPI.Versao1.Controllers
     [ApiController]
     [ApiVersion("1.0", Deprecated = true)] // /api/v1/palavras
     [ApiVersion("1.1")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    //[Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/[controller]")] //passando a versão na queryString de forma diferente api/palavras?api-version=1
     public class PalavrasController : ControllerBase
     {
         private readonly IPalavraRepositorio _palavraRepositorio;
