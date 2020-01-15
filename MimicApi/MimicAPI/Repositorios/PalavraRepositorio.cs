@@ -65,8 +65,8 @@ namespace MimicAPI.Repositorios
 
                 var paginacao = new Paginacao
                 {
-                    NumeroPagina = queryString.Pagina.Value,
-                    RegistroPorPagina = queryString.QtdeRegistros.Value,
+                    NumeroDaPagina = queryString.Pagina.Value,
+                    RegistrosPorPagina = queryString.QtdeRegistros.Value,
                     TotalRegistros = qtdeTotalRegistros,
                     TotalPaginas = qtdeTotalPaginas
                 };

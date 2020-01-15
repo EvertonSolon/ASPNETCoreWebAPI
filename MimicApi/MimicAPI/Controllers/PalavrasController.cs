@@ -30,12 +30,16 @@ namespace MimicAPI.Controllers
         {
             var listaObjetos = _palavraRepositorio.ObterTodas(queryString);
 
-            if(listaObjetos.Palavras.Count == 0)
+            if (listaObjetos.Palavras.Count == 0)
                 return NotFound();
 
-            if (listaObjetos.Paginacao != null)
-                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(listaObjetos.Paginacao));
+            var listaPalavraDto = CriarListaLinksPalavraDto(queryString, listaObjetos);
 
+            return Ok(listaPalavraDto);
+        }
+
+        private ListaPaginacao<PalavraDto> CriarListaLinksPalavraDto(PalavraUrlQueryString queryString, ListaPaginacao<Palavra> listaObjetos)
+        {
             var listaPalavraDto = _mapper.Map<ListaPaginacao<Palavra>, ListaPaginacao<PalavraDto>>(listaObjetos);
 
             foreach (var palavra in listaPalavraDto.Palavras)
@@ -50,7 +54,41 @@ namespace MimicAPI.Controllers
                 new LinkDto("self", Url.Link("ObterTodas", queryString), "GET")
                 );
 
-            return Ok(listaPalavraDto);
+            if (listaObjetos.Paginacao != null)
+            {
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(listaObjetos.Paginacao));
+
+                if (queryString.Pagina + 1 < listaObjetos.Paginacao.TotalPaginas)
+                {
+                    var novaQueryString = new PalavraUrlQueryString
+                    {
+                        Pagina = queryString.Pagina + 1,
+                        QtdeRegistros = queryString.QtdeRegistros,
+                        Data = queryString.Data
+                    };
+
+                    listaPalavraDto.ListaLinks.Add(
+                    new LinkDto("proximaPagina", Url.Link("ObterTodas", novaQueryString), "GET")
+                    );
+                }
+
+                if (queryString.Pagina - 1 > 0 || queryString.Pagina + 1 == listaObjetos.Paginacao.TotalPaginas)
+                {
+                    var novaQueryString = new PalavraUrlQueryString
+                    {
+                        Pagina = queryString.Pagina - 1,
+                        QtdeRegistros = queryString.QtdeRegistros,
+                        Data = queryString.Data
+                    };
+
+                    listaPalavraDto.ListaLinks.Add(
+                    new LinkDto("paginaAnterior", Url.Link("ObterTodas", novaQueryString), "GET")
+                    );
+                }
+
+            }
+
+            return listaPalavraDto;
         }
 
         //Web
