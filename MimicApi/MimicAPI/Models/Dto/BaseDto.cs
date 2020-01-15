@@ -7,6 +7,6 @@ namespace MimicAPI.Models.Dto
 {
     public abstract class BaseDto
     {
-        public List<LinkDto> Links { get; set; }
+        public List<LinkDto> Links { get; set; } = new List<LinkDto>();
     }
 }
