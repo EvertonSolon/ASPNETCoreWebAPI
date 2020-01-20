@@ -26,6 +26,11 @@ namespace MimicAPI.Versao1.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Operação que pega do banco de dados todas as palavras existentes.
+        /// </summary>
+        /// <param name="queryString">Filtros de pesquisa</param>
+        /// <returns>Listagem de palavras</returns>
         //App
         //Rota -> site/api/palavras?data=2020-01-11 para cair no método abaixo.
         //Rota -> site/api/palavras?pagina=1 para cair no método abaixo.
@@ -43,6 +48,136 @@ namespace MimicAPI.Versao1.Controllers
             var listaPalavraDto = CriarListaLinksPalavraDto(queryString, listaObjetos);
 
             return Ok(listaPalavraDto);
+        }
+
+        /// <summary>
+        /// Operação que pega uma única palavra da base de dados.
+        /// </summary>
+        /// <param name="id">Código identificador da palavra</param>
+        /// <returns>Um objeto de palavra</returns>
+        //Web
+        //Rota -> site/api/palavras/1 para cair no método abaixo com o parâmetro 1 (id da palavra a ser buscada).
+        [HttpGet("{id}", Name = "Obter")]
+        [MapToApiVersion("1.0")]
+        [MapToApiVersion("1.1")]
+        public ActionResult Obter(int id)
+        {
+            var objeto = _palavraRepositorio.Obter(id);
+
+            if (objeto == null)
+                return NotFound(); //Ou StatusCode(404);
+
+            var palavraDto = _mapper.Map<Palavra, PalavraDto>(objeto);
+
+            GerarListaLinkDto(palavraDto, VerbosHttpConstante.Get);
+
+            return Ok(palavraDto);
+        }
+
+        
+        /// <summary>
+        /// Operação de realiza o cadastro da palavra
+        /// </summary>
+        /// <param name="palavra">Um objeto palavra</param>
+        /// <returns>Um objeto palavra com seu Id</returns>
+        //Rota -> site/api/palavras para cair no método abaixo (POST: id, nome, ativo, pontuação, data da criação).
+        [MapToApiVersion("1.0")]
+        [MapToApiVersion("1.1")]
+        [Route("")]
+        [HttpPost]
+        public ActionResult Cadastrar([FromBody]Palavra palavra)
+        {
+            if (palavra == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
+
+            palavra.Ativo = true;
+            palavra.Criado = DateTime.Now;
+
+            _palavraRepositorio.Cadastrar(palavra);
+
+            var palavraDto = _mapper.Map<Palavra, PalavraDto>(palavra);
+
+            GerarListaLinkDto(palavraDto, VerbosHttpConstante.Get);
+
+            return Created($"/api/palavras/{palavra.Id}", palavraDto);
+        }
+
+        /// <summary>
+        /// Operação que realiza a substituição de dados de uma palavra específica.
+        /// </summary>
+        /// <param name="id">Código identificador da palavra a ser alterada</param>
+        /// <param name="palavra">Objeto palavra com dados para alteração</param>
+        /// <returns>Retorna o código do status Http</returns>
+        [MapToApiVersion("1.0")]
+        [MapToApiVersion("1.1")]
+        //Rota -> site/api/palavras/1 para cair no método abaixo com o parâmetro 1 (PUT: id, nome, ativo, pontuação, data da criação).
+        [HttpPut("{id}", Name = "Atualizar")]
+        public ActionResult Atualizar(int id, [FromBody]Palavra palavra)
+        {
+
+            if (palavra == null)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
+
+            var objeto = _palavraRepositorio.Obter(palavra.Id);
+
+            if (objeto == null)
+                return NotFound();
+
+            palavra.Id = id;
+            palavra.Ativo = objeto.Ativo;
+            palavra.Criado = objeto.Criado;
+            palavra.Atualizado = DateTime.Now;
+
+            _palavraRepositorio.Atualizar(palavra);
+
+            var palavraDto = _mapper.Map<Palavra, PalavraDto>(palavra);
+
+            GerarListaLinkDto(palavraDto, VerbosHttpConstante.Put);
+
+            return Ok(palavraDto);
+        }
+        /// <summary>
+        /// Operaçã que desativa uma palavra do sistema
+        /// </summary>
+        /// <param name="id">Código identifcador da palavra</param>
+        /// <returns>Retorna o status do código Http</returns>
+        [MapToApiVersion("1.1")]
+        [HttpDelete("{id}", Name = "Deletar")]
+        public ActionResult Deletar(int id)
+        {
+            var objeto = _palavraRepositorio.Obter(id);
+
+            if (objeto == null)
+                return NotFound();
+
+            _palavraRepositorio.Deletar(id);
+
+            return NoContent();
+        }
+
+        #region Métodos privados
+        private void GerarListaLinkDto(PalavraDto palavraDto, string verboHttp)
+        {
+            switch (verboHttp)
+            {
+                case VerbosHttpConstante.Get:
+                    palavraDto.Links.Add(new LinkDto("self", Url.Link("Obter", new { id = palavraDto.Id }), VerbosHttpConstante.Get));
+                    break;
+                case VerbosHttpConstante.Put:
+                    palavraDto.Links.Add(new LinkDto("update", Url.Link("Atualizar", new { id = palavraDto.Id }), VerbosHttpConstante.Put));
+                    break;
+                case VerbosHttpConstante.Delete:
+                    palavraDto.Links.Add(new LinkDto("delete", Url.Link("Deletar", new { id = palavraDto.Id }), VerbosHttpConstante.Delete));
+                    break;
+                default:
+                    break;
+            }
         }
 
         private ListaPaginacao<PalavraDto> CriarListaLinksPalavraDto(PalavraUrlQueryString queryString, ListaPaginacao<Palavra> listaObjetos)
@@ -97,109 +232,6 @@ namespace MimicAPI.Versao1.Controllers
 
             return listaPalavraDto;
         }
-
-        //Web
-        //Rota -> site/api/palavras/1 para cair no método abaixo com o parâmetro 1 (id da palavra a ser buscada).
-        [HttpGet("{id}", Name = "Obter")]
-        [MapToApiVersion("1.0")]
-        [MapToApiVersion("1.1")]
-        public ActionResult Obter(int id)
-        {
-            var objeto = _palavraRepositorio.Obter(id);
-
-            if (objeto == null)
-                return NotFound(); //Ou StatusCode(404);
-
-            var palavraDto = _mapper.Map<Palavra, PalavraDto>(objeto);
-
-            GerarListaLinkDto(palavraDto, VerbosHttpConstante.Get);
-
-            return Ok(palavraDto);
-        }
-
-        private void GerarListaLinkDto(PalavraDto palavraDto, string verboHttp)
-        {
-            switch (verboHttp)
-            {
-                case VerbosHttpConstante.Get:
-                    palavraDto.Links.Add(new LinkDto("self", Url.Link("Obter", new { id = palavraDto.Id }), VerbosHttpConstante.Get));
-                    break;
-                case VerbosHttpConstante.Put:
-                    palavraDto.Links.Add(new LinkDto("update", Url.Link("Atualizar", new { id = palavraDto.Id }), VerbosHttpConstante.Put));
-                    break;
-                case VerbosHttpConstante.Delete:
-                    palavraDto.Links.Add(new LinkDto("delete", Url.Link("Deletar", new { id = palavraDto.Id }), VerbosHttpConstante.Delete));
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        //Rota -> site/api/palavras para cair no método abaixo (POST: id, nome, ativo, pontuação, data da criação).
-        [Route("")]
-        [HttpPost]
-        public ActionResult Cadastrar([FromBody]Palavra palavra)
-        {
-            if (palavra == null)
-                return BadRequest();
-
-            if (!ModelState.IsValid)
-                return UnprocessableEntity(ModelState);
-
-            palavra.Ativo = true;
-            palavra.Criado = DateTime.Now;
-
-            _palavraRepositorio.Cadastrar(palavra);
-
-            var palavraDto = _mapper.Map<Palavra, PalavraDto>(palavra);
-
-            GerarListaLinkDto(palavraDto, VerbosHttpConstante.Get);
-
-            return Created($"/api/palavras/{palavra.Id}", palavraDto);
-        }
-
-        //Rota -> site/api/palavras/1 para cair no método abaixo com o parâmetro 1 (PUT: id, nome, ativo, pontuação, data da criação).
-        [HttpPut("{id}", Name = "Atualizar")]
-        public ActionResult Atualizar(int id, [FromBody]Palavra palavra)
-        {
-
-            if (palavra == null)
-                return BadRequest();
-
-            if (!ModelState.IsValid)
-                return UnprocessableEntity(ModelState);
-
-            var objeto = _palavraRepositorio.Obter(palavra.Id);
-
-            if (objeto == null)
-                return NotFound();
-
-            palavra.Id = id;
-            palavra.Ativo = objeto.Ativo;
-            palavra.Criado = objeto.Criado;
-            palavra.Atualizado = DateTime.Now;
-
-            _palavraRepositorio.Atualizar(palavra);
-
-            var palavraDto = _mapper.Map<Palavra, PalavraDto>(palavra);
-
-            GerarListaLinkDto(palavraDto, VerbosHttpConstante.Put);
-
-            return Ok(palavraDto);
-        }
-
-        [MapToApiVersion("1.1")]
-        [HttpDelete("{id}", Name = "Deletar")]
-        public ActionResult Deletar(int id)
-        {
-            var objeto = _palavraRepositorio.Obter(id);
-
-            if (objeto == null)
-                return NotFound();
-
-            _palavraRepositorio.Deletar(id);
-
-            return NoContent();
-        }
+        #endregion
     }
 }

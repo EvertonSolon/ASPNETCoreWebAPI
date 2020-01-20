@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MimicAPI</name>
+    </assembly>
+    <members>
+        <member name="M:MimicAPI.Versao1.Controllers.PalavrasController.ObterTodas(MimicAPI.Helpers.PalavraUrlQueryString)">
+            <summary>
+            Operação que pega do banco de dados todas as palavras existentes.
+            </summary>
+            <param name="queryString">Filtros de pesquisa</param>
+            <returns>Listagem de palavras</returns>
+        </member>
+        <member name="M:MimicAPI.Versao1.Controllers.PalavrasController.Obter(System.Int32)">
+            <summary>
+            Operação que pega uma única palavra da base de dados.
+            </summary>
+            <param name="id">Código identificador da palavra</param>
+            <returns>Um objeto de palavra</returns>
+        </member>
+        <member name="M:MimicAPI.Versao1.Controllers.PalavrasController.Cadastrar(MimicAPI.Versao1.Models.Palavra)">
+            <summary>
+            Operação de realiza o cadastro da palavra
+            </summary>
+            <param name="palavra">Um objeto palavra</param>
+            <returns>Um objeto palavra com seu Id</returns>
+        </member>
+        <member name="M:MimicAPI.Versao1.Controllers.PalavrasController.Atualizar(System.Int32,MimicAPI.Versao1.Models.Palavra)">
+            <summary>
+            Operação que realiza a substituição de dados de uma palavra específica.
+            </summary>
+            <param name="id">Código identificador da palavra a ser alterada</param>
+            <param name="palavra">Objeto palavra com dados para alteração</param>
+            <returns>Retorna o código do status Http</returns>
+        </member>
+        <member name="M:MimicAPI.Versao1.Controllers.PalavrasController.Deletar(System.Int32)">
+            <summary>
+            Operaçã que desativa uma palavra do sistema
+            </summary>
+            <param name="id">Código identifcador da palavra</param>
+            <returns>Retorna o status do código Http</returns>
+        </member>
+        <member name="T:MimicAPI.Versao1.Models.Palavra">
+            <summary>
+            As validações foram incluídas nesta entidade mas sei que poderia existir uma view model e incluir lá.
+            </summary>
+        </member>
+        <member name="M:MimicAPI.Versao2.Controllers.PalavrasController.ObterTodas(MimicAPI.Helpers.PalavraUrlQueryString)">
+            <summary>
+            Operação que pega do banco de dados todas as palavras existentes.
+            </summary>
+            <param name="queryString">Filtros de pesquisa</param>
+            <returns>Listagem de palavras</returns>
+        </member>
+    </members>
+</doc>

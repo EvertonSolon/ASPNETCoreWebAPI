@@ -5,13 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using MimicAPI.Database;
 using MimicAPI.Versao1.Repositorios;
 using MimicAPI.Versao1.Repositorios.Interfaces;
-using System.IO;
-using System.Reflection;
 using AutoMapper;
 using MimicAPI.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using System.Linq;
+using MimicAPI.Helpers.Swagger;
+using Microsoft.Extensions.PlatformAbstractions;
+using System.IO;
 
 namespace MimicAPI
 {
@@ -52,11 +52,44 @@ namespace MimicAPI
 
             services.AddSwaggerGen(cfg => {
                 cfg.ResolveConflictingActions(apiDescription =>  apiDescription.First());
-                cfg.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info()
+                
+                //A ordem foi invertida com a mais recente no topo
+                cfg.SwaggerDoc("v2.0", new Swashbuckle.AspNetCore.Swagger.Info()
                 {
-                    Title = "MimicAPI - V1",
-                    Version = "v1"
+                    Title = "MimicAPI - V2.0",
+                    Version = "v2.0"
                 });
+                cfg.SwaggerDoc("v1.1", new Swashbuckle.AspNetCore.Swagger.Info()
+                {
+                    Title = "MimicAPI - V1.1",
+                    Version = "v1.1"
+                });
+                cfg.SwaggerDoc("v1.0", new Swashbuckle.AspNetCore.Swagger.Info()
+                {
+                    Title = "MimicAPI - V1.0",
+                    Version = "v1.0"
+                });
+                cfg.DocInclusionPredicate((docName, apiDesc) =>
+                {
+                    var actionApiVersionModel = apiDesc.ActionDescriptor?.GetApiVersion();
+                    // would mean this action is unversioned and should be included everywhere
+                    if (actionApiVersionModel == null)
+                    {
+                        return true;
+                    }
+                    if (actionApiVersionModel.DeclaredApiVersions.Any())
+                    {
+                        return actionApiVersionModel.DeclaredApiVersions.Any(v => $"v{v.ToString()}" == docName);
+                    }
+                    return actionApiVersionModel.ImplementedApiVersions.Any(v => $"v{v.ToString()}" == docName);
+                });
+
+                var caminhoProjeto = PlatformServices.Default.Application.ApplicationBasePath;
+                var nomeProjeto = $"{PlatformServices.Default.Application.ApplicationName}.xml";
+                var caminhoArquivoXmlComentario = Path.Combine(caminhoProjeto, nomeProjeto);
+
+                cfg.IncludeXmlComments(caminhoArquivoXmlComentario);
+                cfg.OperationFilter<ApiVersionOperationFilter>();
             });
         }
 
@@ -72,7 +105,9 @@ namespace MimicAPI
             app.UseMvc();
             app.UseSwagger();// /swagger/v1/swagger.json
             app.UseSwaggerUI(cfg => {
-                cfg.SwaggerEndpoint("/swagger/v1/swagger.json", "MimicAPI");
+                cfg.SwaggerEndpoint("/swagger/v2.0/swagger.json", "MimicAPI - V2.0");
+                cfg.SwaggerEndpoint("/swagger/v1.1/swagger.json", "MimicAPI - V1.1");
+                cfg.SwaggerEndpoint("/swagger/v1.0/swagger.json", "MimicAPI - V1.0");
                 cfg.RoutePrefix = string.Empty;
                 });
         }

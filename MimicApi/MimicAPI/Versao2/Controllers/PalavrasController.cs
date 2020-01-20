@@ -25,6 +25,11 @@ namespace MimicAPI.Versao2.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Operação que pega do banco de dados todas as palavras existentes.
+        /// </summary>
+        /// <param name="queryString">Filtros de pesquisa</param>
+        /// <returns>Listagem de palavras</returns>
         //App
         //Rota -> site/api/palavras?data=2020-01-11 para cair no método abaixo.
         //Rota -> site/api/palavras?pagina=1 para cair no método abaixo.
